@@ -1,155 +1,193 @@
-1. Kopieer een groot bestand met "time"
-bash
-```
+# Linux Command-line Oefeningen
+
+## 1. Kopieer een groot bestand met `time`
+Gebruik het volgende commando om de tijd te meten:
+
+```bash
 time cp /path/to/largefile /path/to/destination
 ```
-Herhaal dit nog een keer en vergelijk de twee metingen van tijd.
 
-2. Schakel process accounting aan
-bash
-```
+Herhaal dit commando en vergelijk de twee metingen van tijd.
+
+---
+
+## 2. Schakel process accounting aan
+Installeer en activeer de accounting software:
+
+```bash
 sudo apt-get install acct  # Installeer de accounting software
 sudo service acct start    # Start de service
 ```
-# Bekijk de meest gebruikte processen
-```
+
+Bekijk de meest gebruikte processen:
+
+```bash
 sudo lastcomm
 ```
-3. Draai vmstat
-bash
-```
+
+---
+
+## 3. Draai `vmstat`
+Meet systeemstatistieken met het volgende commando:
+
+```bash
 vmstat 2 10
 ```
-Hiermee wordt om de 2 seconden 10 metingen weergegeven. Bekijk het aantal processen in de rij "r" (voor processen die klaar zijn om te draaien) en "b" (voor processen die wachten op I/O).
 
-4. Bekijk de cache die de kernel gebruikt
-bash
-```
+Bekijk vooral:
+- Kolom `r`: Aantal processen die klaar zijn om te draaien.
+- Kolom `b`: Aantal processen die wachten op I/O.
+
+---
+
+## 4. Bekijk de cache die de kernel gebruikt
+Gebruik een van de volgende commando's om het geheugen te analyseren:
+
+```bash
 free -h
 ```
-Of
 
-bash
-```
+of
+
+```bash
 cat /proc/meminfo
 ```
-Kijk naar het veld Cached in de output. Dit geeft informatie over het gebruik van de pagina cache.
 
-5. Draai IPC-gebruikende applicaties
-Gebruik bijvoorbeeld de volgende commando's om te zien of applicaties IPC gebruiken:
+Let op het veld **Cached** in de output.
 
-bash
-```
+---
+
+## 5. Controleer IPC-gebruik
+Gebruik onderstaand commando om te zien of applicaties IPC (Inter-Process Communication) gebruiken:
+
+```bash
 ipcs -a
 ```
-6. Vi editor
-a) Gebruik ldd om te zien welke libraries vi gebruikt:
 
-bash
-```
+---
+
+## 6. Analyseer `vi` met tools
+### a) Bekijk de libraries die `vi` gebruikt:
+```bash
 ldd $(which vi)
 ```
-b) Gebruik pmap om het geheugengebruik van vi te bekijken:
 
-bash
+### b) Bekijk het geheugengebruik van `vi`:
+```bash
+pmap $(pgrep vi)
 ```
-pmap $(pgrep vi)  # Gebruik pgrep om het PID van vi te krijgen
-```
-c) Verschil tussen de bibliotheken die pmap en ldd tonen:
 
-ldd toont de gedeelde bibliotheken die tijdens runtime gekoppeld worden.
-pmap toont het geheugengebruik van het proces en de virtuele geheugenstructuren.
-7. Test de prestaties van je schijf met hdparm
-bash
-```
+### c) Uitleg verschil tussen `ldd` en `pmap`:
+- **ldd**: Toont gedeelde bibliotheken gekoppeld tijdens runtime.
+- **pmap**: Toont het geheugengebruik van het proces.
+
+---
+
+## 7. Test schijfprestaties met `hdparm`
+Meet lees- en schrijfsnelheden van de schijf:
+
+```bash
 sudo hdparm -Tt /dev/sda
 ```
-Dit geeft informatie over de lees- en schrijfsnelheden van de schijf.
 
-8. Gebruik lsof om netwerkprocessen te controleren
-bash
-```
+---
+
+## 8. Controleer netwerkprocessen met `lsof`
+Toon alle processen die netwerkverbindingen gebruiken:
+
+```bash
 sudo lsof -i
 ```
-Dit toont alle processen die netwerkverbindingen gebruiken.
 
-10. Maak een netwerkinterface aan en test met ip
-bash
-```
+---
+
+## 9. Maak een netwerkinterface aan en test
+### Maak de interface aan:
+```bash
 sudo ip link add dummy1 type dummy
 sudo ip addr add 1.2.3.4/24 dev dummy1
 sudo ip link set dev dummy1 up
 ```
-# Test of je kunt pingen
-```
+
+### Test de interface:
+```bash
 ping 1.2.3.4
 ```
 
-# Verwijder de interface
-```
+### Verwijder de interface:
+```bash
 sudo ip link delete dummy1
 ```
-10. Oneindige loop in shell script
+
+---
+
+## 10. Oneindige loop in een shell script
 Schrijf een shell script met een oneindige loop:
 
-bash
-```
+```bash
 #!/bin/bash
 while true; do
   echo "Running"
 done
 ```
-Gebruik cpulimit om de CPU-belasting te beperken:
 
-bash
-```
+Gebruik `cpulimit` om de CPU-belasting te beperken:
+
+```bash
 sudo apt-get install cpulimit
 cpulimit -l 10 -p $(pgrep -f "your_script_name")
 ```
-Dit zorgt ervoor dat de loop weinig CPU gebruikt.
 
-11. Extra swapfile maken
-Maak een swapfile:
+---
 
-bash
-```
+## 11. Extra swapfile maken
+Maak en activeer een nieuwe swapfile:
+
+```bash
 sudo fallocate -l 1G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 ```
-# Controleer of het systeem de swapfile gebruikt
-```
+
+Controleer of de swapfile actief is:
+
+```bash
 swapon --show
 ```
-12. Verander een kernelparameter voor swappen
-Wijzig de swapfrequentie in de kernel:
 
-bash
-```
+---
+
+## 12. Verander een kernelparameter voor swappen
+Pas de swapfrequentie aan:
+
+```bash
 sudo sysctl vm.swappiness=100
 ```
-Dit zorgt ervoor dat het systeem sneller naar swap zal gaan. Controleer de swap met swapon --show.
 
-13. Compileer en voer c/c++-bestanden uit
-Om te compileren:
+Controleer de swapinstellingen met:
 
-bash
+```bash
+swapon --show
 ```
+
+---
+
+## 13. Compileer en voer C/C++-bestanden uit
+### Compileer de bestanden:
+```bash
 gcc b.c -o b
 g++ c.cpp -o c
 ```
-Start de programma's:
 
-bash
-```
+### Voer de programma's uit:
+```bash
 ./b
 ./c
 ```
-Als er een fout optreedt, lees dan de foutmelding en los deze op. Voor b.c moet je wellicht een Apache-server draaien:
 
-bash
-```
+Als er een fout optreedt, controleer dan de foutmelding. Voor sommige programma's, zoals `b.c`, moet je mogelijk een Apache-server starten:
+
+```bash
 sudo service apache2 start
 ```
-Deze opdrachten zouden je moeten helpen de oefeningen uit te voeren!
